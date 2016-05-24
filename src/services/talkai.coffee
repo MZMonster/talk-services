@@ -45,7 +45,7 @@ _getTuringCallback = (message) ->
 
   requestAsync
     method: 'POST'
-    url: "#{talkai.config.url}"
+    url: talkai.config.url
     body: query
     json: true
     timeout: 20000
