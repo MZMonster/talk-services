@@ -44,15 +44,16 @@ _getTuringCallback = (message) ->
     userid: message._creatorId.toString()
 
   requestAsync
-    method: 'GET'
-    url: "#{talkai.config.url}?#{qs.stringify(query)}"
+    method: 'POST'
+    url: "#{talkai.config.url}"
+    body: query
+    json: true
     timeout: 20000
 
   .then (res) ->
     unless res.statusCode >= 200 and res.statusCode < 300
       throw new Error("Bad request #{res.statusCode}")
-    resp = res.body
-    data = JSON.parse resp
+    data = res.body
     if data.code.toString() in Object.keys talkai.config.errorCodes
       code = parseInt(req.code)
       errMsg = talkai.config.errorCodes[req.code]
@@ -68,10 +69,10 @@ _getTuringCallback = (message) ->
         else
           body.content = data.text.replace(reBr, "\n").replace(reSemi, ";\n")
       when talkai.config.urlCode
-        body.title = "OK, 已经帮您找到#{query.info}, 快来点开看看吧~"
+        body.title = "OK, 已经帮您找到, 快来点开看看吧~"
         body.redirectUrl = data.url
       when talkai.config.newsCode
-        body.title = "OK, 已经帮您找到#{query.info}"
+        body.title = "OK, 已经帮您找到"
         body.text = "<ul>"
         data.list.forEach (el) ->
           body.text += "<li><a href=" + el.detailurl + ">#{el.article}</a></li>"
