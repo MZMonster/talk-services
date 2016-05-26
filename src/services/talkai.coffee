@@ -69,33 +69,28 @@ _getTuringCallback = (message) ->
         else
           body.content = data.text.replace(reBr, "\n").replace(reSemi, ";\n")
       when talkai.config.urlCode
-        body.title = "OK, 已经帮您找到, 快来点开看看吧~"
-        body.redirectUrl = data.url
+        body.content = "[#{data.text}](#{data.url})"
       when talkai.config.newsCode
-        body.title = "OK, 已经帮您找到"
-        body.text = "<ul>"
+        body.content = ''
         data.list.forEach (el) ->
-          body.text += "<li><a href=" + el.detailurl + ">#{el.article}</a></li>"
-        body.text += "</ul>"
+          body.content += "\n[#{el.article}](#{el.detailurl})"
       when talkai.config.trainCode
-        body.title = "OK, 已经帮您找到列车信息"
-        body.text = "<ul>"
+        body.content = ''
         data.list.forEach (el) ->
-          body.text += "<li><a href=" + el.detailurl + ">#{el.trainnum} #{el.start} - #{el.terminal} / 时间: #{el.starttime} - #{el.endtime}</a></li>"
-        body.text += "</ul>"
+          body.content += "\n[#{el.trainnum} #{el.start} - #{el.terminal} / 时间: #{el.starttime} - #{el.endtime}](#{el.detailurl})"
       when talkai.config.flightCode
-        body.title = "OK, 已经帮您找到航班信息"
         body.text = "<ul>"
         data.list.forEach (el) ->
           # body.text += "<li><a href=" + el.detailurl + ">#{el.flight} / 时间: #{el.starttime} - #{el.endtime}</a></li>"
           body.text += "<li>#{el.flight} / 时间: #{el.starttime} - #{el.endtime}</li>"
         body.text += "</ul>"
       when talkai.config.othersCode
-        body.title = data.text
-        body.text = "<ul>"
+        body.content = ''
+        i = 0
         data.list.forEach (el) ->
-          body.text += "<li><a href=" + el.detailurl + ">#{el.name}</a></li>"
-        body.text += "</ul>"
+          return if i > 4
+          i += 1
+          body.content += "\n[#{el.name}](#{el.detailurl})\n\t- #{el.info}"
 
     return body
 
