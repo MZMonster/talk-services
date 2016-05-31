@@ -6,14 +6,32 @@ _receiveWebhook = ({query, body}) ->
     , query or {}
     , body or {}
 
-  {content, authorName, title, text, redirectUrl, imageUrl} = payload
+  {
+    content, authorName, displayType, creator
+    title, text, redirectUrl, imageUrl, mention
+  } = payload
 
   throw new Error("Title and text can not be empty") unless title?.length or text?.length or content?.length
 
   message =
-    body: content
+    body: content or payload.body or ''
     authorName: authorName
-    displayType: payload.displayType
+    creator: creator
+    team: payload.team
+    displayType: displayType
+
+  if mention and mention._id and mention.name
+    message.body = "<$at|#{mention._id}|@#{mention.name}$> #{message.body or ''}"
+    message.mentions = [mention._id]
+
+  switch
+    when payload._roomId
+      message.room = payload._roomId
+    when payload._toId
+      message.to = payload._toId
+    when payload._storyId
+      message.story = payload._storyId
+    else throw new Err('PARAMS_MISSING', '_toId _roomId _storyId')
 
   if title or text or redirectUrl or imageUrl
     message.attachments = [
